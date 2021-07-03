@@ -946,9 +946,9 @@ body1 {
 
 #facef{
   position:absolute;
-  top: 200px;
+  top: 150px;
   width: 500px;
-  height: 500px;
+  height: 550px;
   background-color: white;
   border-radius: 12px;
 }

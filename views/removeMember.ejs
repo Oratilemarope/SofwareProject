@@ -12,13 +12,7 @@
     </head>
 
     
-    <% if(errormessage && errormessage.length> 0) { %>
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <strong>Warning!</strong>
-            <%=errormessage %>
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-        </div>
-        <% } %>
+    
 
 
 <body style="background-color: powderblue;">
@@ -29,7 +23,13 @@
     <div id="addrec2">
         
        <h3>Tell us who you want to kick out of the group</h3><br>
-    
+       <% if(errormessage && errormessage.length> 0) { %>
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Warning!</strong>
+            <%=errormessage %>
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+        <% } %>
 
      <form id="frm3" action="/groups/api/removeMember" method="post" >
         <label for="groupName">Enter the Members's Name: </label><br>

@@ -11,13 +11,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 
-<% if(errormessage && errormessage.length> 0) { %>
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        <strong>Warning!</strong>
-        <%=errormessage %>
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-    </div>
-    <% } %>
+
 
 
 <body style="background-color: powderblue;">
@@ -28,6 +22,15 @@
 
 <div id="addrec">
     <h3>Add the name of the user you would like to invite to join your group</h3>
+
+    <% if(errormessage && errormessage.length> 0) { %>
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          <strong>Warning!</strong>
+          <%=errormessage %>
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+      <% } %>
+
   <form id="frm3" action="/groups/api/joinByInvite" method="POST">
     <label for="userName">Username: </label><br>
     <input id="userName" name="inviteeName" placeholder="Username"><br><br>
