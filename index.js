@@ -1,5 +1,6 @@
 'use strict'
 
+//Dependencies
 const express = require('express')
 const http = require('http')
 const session = require('express-session')
@@ -9,11 +10,12 @@ const flash = require('connect-flash')
 const db = require('./database/db')
 const cors = require('cors')
 const Autolinker = require('autolinker')
-
 const app = express()
 const server = http.createServer(app)
 app.use(cookieParser())
 const io = socketio(server)
+
+//Linked files/modules 
 const format = require('./public/scripts/user/messages.js')
 const active = require('./public/scripts/user/sessions.js')
 
@@ -40,9 +42,10 @@ const MemoryStore = require('memorystore')(session)
 const bodyParser = require('body-parser')
 
 // loading our routers
+const projectsRouter = require('./projectsRoutes')
 const mainRouter = require('./mainRoutes')
 const userRouter = require('./userRoutes')
-const groupsRouter = require('./groupsRoutes')
+
 
 // tell Express to use bosyParser for JSON and URL encoded from bodies
 app.use(bodyParser.json())
@@ -81,7 +84,7 @@ app.use(flash())
 // mounting our routers
 app.use(mainRouter)
 app.use('/user', userRouter.router)
-app.use('/groups', groupsRouter.router)
+app.use('/projects', projectsRouter.router)
 app.use('/cdn', express.static('public')) /* This will mount your public directory to '/cdn'.
 i.e. your scripts folder will be at /cdn/scripts */
 
@@ -92,8 +95,9 @@ io.on('connection', socket => {
     .then((pool) => {
       return pool.request()
 
-        .query(`SELECT * FROM Resources WHERE groupName_ID = '${active.getActiveGroup()}'`)
+        .query(`SELECT * FROM project_Resources WHERE projectName_ID = '${active.getActiveGroup()}'`)
     })
+
   // send back the result
     .then(result => {
       format.setExistingMessages(result.recordset)
@@ -101,7 +105,7 @@ io.on('connection', socket => {
       // Load Existing Messages
       for (let a = mss.length - 1; a > -1; a--) {
         const autolinker = new Autolinker()
-        io.emit('message', format.formatMessage(mss[a].userName_ID, autolinker.link(mss[a].resourcesLink), `${mss[a].dateTime.getHours() - 2}:${String(mss[a].dateTime.getMinutes()).padStart(2, '0')}`, `${String(mss[a].dateTime.getDate()).padStart(2, '0')}/${String(mss[a].dateTime.getMonth() + 1).padStart(2, '0')}/${mss[a].dateTime.getFullYear()}`))
+        io.emit('message', format.formatMessage(mss[a].employeeNumber_ID, autolinker.link(mss[a].resourcesLink), `${mss[a].dateTime.getHours() - 2}:${String(mss[a].dateTime.getMinutes()).padStart(2, '0')}`, `${String(mss[a].dateTime.getDate()).padStart(2, '0')}/${String(mss[a].dateTime.getMonth() + 1).padStart(2, '0')}/${mss[a].dateTime.getFullYear()}`))
       }
     })
   // If there's an error, return that with some description
@@ -118,7 +122,7 @@ io.on('connection', socket => {
       .then((pool) => {
         return pool.request()
 
-          .query(`INSERT INTO Resources(resourcesLink, resourceName, dateTime, groupName_ID, userName_ID) VALUES ('${msg}', 'link', '${year}-${month}-${day} ${hour}:${minutes}:${seconds}', '${active.getActiveGroup()}', '${active.getUser()}')`)
+          .query(`INSERT INTO project_Resources(resourcesLink, resourceName, dateTime, projectName_ID, employeeNumber_ID) VALUES ('${msg}', 'link', '${year}-${month}-${day} ${hour}:${minutes}:${seconds}', '${active.getActiveGroup()}', '${active.getUser()}')`)
       })
 
       // If there's an error, return that with some description
@@ -126,49 +130,12 @@ io.on('connection', socket => {
         console.log(err)
       })
 
-    db.pools
-      // Run query
-      .then((pool) => {
-        return pool.request()
-          // perfoming a query
-          .query(`INSERT INTO logActivities (initiatedBy, activity, inGroup, dateAndTime) VALUES ('${active.getUser()}', 'Added a message in the chat', '${active.getActiveGroup()}', '${year}-${month}-${day} ${hour}:${minutes}:${seconds}');`)
-      })
-      // Processing the response
-      .then(result => {
-        console.log('logged successfully')
-      })
-      // If there's an error, return that with some description
-      .catch(err => {
-        console.log(err)
-      })
-  })
-
-  // Update location using socket id as a key
-  socket.on('updateLocation', pos => {
-    clientLocation.set(socket.id, pos)
-    const latitude = pos.lat
-    const longitude = pos.lng
-
-    db.pools
-      .then((pool) => {
-        return pool.request()
-          .query(`UPDATE meetingRequests 
-                  SET latitude = '${latitude}',  longitude ='${longitude}'
-                  WHERE userName_ID = '${active.getUser()}' AND meetingStatus = '${1}'`)
-      })
-      .then(result => {
-        // if the meeting status is 1, then this user is attending a meeting
-        // console.log('recordset', result.recordset[0].nameOfPersonRequesting)
-      })
-      .catch(err => {
-        console.log(err)
-      })
-  })
 
   socket.on('disconnect', () => {
-    clientLocation.delete(socket.id)
+          clientLocation.delete(socket.id)
+    })
   })
-  //
+
 })
 
 const port = process.env.PORT || 3000

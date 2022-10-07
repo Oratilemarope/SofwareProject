@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <title>Manage Courses</title>
+   <title>Update Project Status</title>
  <meta charset="utf-8" />
  <link rel= "stylesheet" href="/cdn/css/style.css">
  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -13,18 +13,20 @@
 <body style="background-color: powderblue;">
   <div class="topnav4">
 		<a href='/user/homepage'>Home</a>
-    <a href= "/groups/group">Groups</a>
+    <a href= "/projects/createdProject">Back</a>
 	</div>
 
   <div id="addCirc2">
-    <h3>Add Courses</h3>
-    <form id="frm3" action ="/groups/api/manageCourses" method="POST" >
-      <label for="Courses">Enter Courses Taken: </label><br>
-      <input type="course1" id="course_1" name="Course1" placeholder="Course" >
-      <input type="course2" id="course_2" name="Course2" placeholder="Course" ><br><br>
-      <input type="course1" id="course_3" name="Course3" placeholder="Course" >
-      <input type="course2" id="course_4" name="Course4" placeholder="Course" ><br><br>
-      <input type="submit" value="submit">
+    <h3>Update Project Status</h3>
+    <form id="frm3" action ="/projects/api/updateProjectStatus" method="POST" >
+        <label for="newProgressStatus">Progress Status:</label>
+        <select id="newProgressStatus" name="newProgressStatus" size="1"><br><br>
+          <option value="Pending">Pending</option>
+          <option value="In- Progress">In- Progress</option>
+          <option value="Completed">Completed</option>
+        </select><br><br>
+
+        <input  type="submit" value="Update Progress Status">
     </form>
   </div>
 
